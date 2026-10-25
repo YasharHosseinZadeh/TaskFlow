@@ -29,10 +29,14 @@ class Task(Base):
 
     description : Mapped[str] = mapped_column(String(500))
 
-    status : Mapped[TaskStatus] = mapped_column(Enum(TaskStatus),default=TaskStatus.PENDING)
-
-    priority : Mapped[TaskPriority] = mapped_column(Enum(TaskPriority),default=TaskPriority.MEDIUM)
-
+    status: Mapped[TaskStatus] = mapped_column(
+        Enum(TaskStatus, values_callable=lambda enum_cls: [member.value for member in enum_cls]),
+        default=TaskStatus.PENDING
+    )
+    priority: Mapped[TaskPriority] = mapped_column(
+        Enum(TaskPriority, values_callable=lambda enum_cls: [member.value for member in enum_cls]),
+        default=TaskPriority.MEDIUM
+    )
     project_id : Mapped[int] = mapped_column(ForeignKey("projects.id"))
 
     project : Mapped["Project"] = relationship(back_populates="tasks")
