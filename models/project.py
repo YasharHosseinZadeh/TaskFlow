@@ -20,4 +20,5 @@ class Project(Base):
 
     owner : Mapped["User"] = relationship(back_populates="projects")
 
-    tasks : Mapped[list["Task"]] = relationship(back_populates="project")
+    tasks: Mapped[list["Task"]] = relationship(back_populates="project")
+
