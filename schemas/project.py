@@ -12,3 +12,8 @@ class ProjectResponse(BaseModel):
     name: str
     description: str | None
     owner_id : int
+
+
+class ProjectUpdate(BaseModel):
+    name: str | None = None
+    description: str | None = None

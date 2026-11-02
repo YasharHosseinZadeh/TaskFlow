@@ -2,11 +2,13 @@ from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from services.project_service import create_project as create_project_service,get_projects as get_projects_service
+from services.project_service import (create_project as create_project_service,
+get_projects as get_projects_service,
+get_project as get_project_service, update_project as update_project_service)
 from database import get_db
 from dependencies import get_current_user
 from models import Project
-from schemas.project import ProjectCreate, ProjectResponse
+from schemas.project import ProjectCreate, ProjectResponse, ProjectUpdate
 
 router = APIRouter()
 
@@ -34,3 +36,28 @@ async def get_projects(
     return result
 
 
+@router.get("/projects/{project_id}",response_model=ProjectResponse)
+async def get_project(
+        project_id: int,
+        db : AsyncSession = Depends(get_db),
+        user = Depends(get_current_user)
+):
+    result = await get_project_service(project_id,db,user.id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Project id is wrong")
+    return result
+
+
+@router.patch("/projects/{project_id}",response_model=ProjectResponse)
+async def update_project(
+        project_info: ProjectUpdate,
+        project_id: int,
+        db : AsyncSession = Depends(get_db),
+        user = Depends(get_current_user),
+):
+    project =  await update_project_service(project_info,db,user.id,project_id)
+
+
+    if project is None:
+        raise HTTPException(status_code=404, detail="Project id is wrong")
+    return project
