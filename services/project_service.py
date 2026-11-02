@@ -32,3 +32,11 @@ async def create_project(
     project = result.scalar_one()
     return project
 
+
+async def get_projects(
+        user_id : int,
+        db : AsyncSession
+):
+    projects = await db.execute(select(Project).where(Project.owner_id == user_id))
+    return projects.scalars().all()
+
