@@ -4,7 +4,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from services.project_service import (create_project as create_project_service,
 get_projects as get_projects_service,
-get_project as get_project_service, update_project as update_project_service)
+get_project as get_project_service,
+update_project as update_project_service,
+delete_project as delete_project_service,)
 from database import get_db
 from dependencies import get_current_user
 from models import Project
@@ -61,3 +63,15 @@ async def update_project(
     if project is None:
         raise HTTPException(status_code=404, detail="Project id is wrong")
     return project
+
+
+@router.delete("/projects/{project_id}")
+async def delete_project(
+        project_id: int,
+        db : AsyncSession = Depends(get_db),
+        user = Depends(get_current_user)
+):
+    result = await delete_project_service(project_id,user.id,db)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Project id is wrong")
+    return result
