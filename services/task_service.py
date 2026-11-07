@@ -87,3 +87,24 @@ async def update_task(task_id:int,task_info:TaskUpdate,user_id:int,db: AsyncSess
     await db.commit()
     await db.refresh(task_result)
     return task_result
+
+
+async def delete_task(task_id:int,user_id:int,db: AsyncSession):
+    task = await db.execute(select(Task).where(Task.id == task_id))
+    task_result = task.scalar_one_or_none()
+
+    if task_result is None:
+        return None
+
+    project = await db.execute(select(Project).where(Project.owner_id == user_id)
+    .where(Project.id == task_result.project_id))
+    result = project.scalar_one_or_none()
+
+    if result is None:
+        return None
+
+    await db.delete(task_result)
+    await db.commit()
+    return {
+        "message": "Task deleted"
+    }
