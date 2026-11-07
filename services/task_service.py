@@ -33,3 +33,16 @@ async def create_task(
     await db.commit()
     await db.refresh(task)
     return task
+
+
+async def get_project_tasks(project_id:int,user_id:int,db: AsyncSession):
+    project = await db.execute(select(Project).where(Project.id == project_id)
+    .where(Project.owner_id == user_id))
+    result = project.scalar_one_or_none()
+
+    if result is None:
+        return None
+
+    tasks = await db.execute(select(Task).where(Task.project_id == project_id))
+    result = tasks.scalars().all()
+    return result
