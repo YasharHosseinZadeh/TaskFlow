@@ -18,3 +18,10 @@ class TaskResponse(BaseModel):
     status: TaskStatus
     priority: TaskPriority
     project_id: int
+
+
+class TaskUpdate(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    status: TaskStatus | None = None
+    priority: TaskPriority | None = None
