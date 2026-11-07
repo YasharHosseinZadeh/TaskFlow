@@ -3,7 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from dependencies import get_current_user
 from database import get_db
 from schemas.task import TaskCreate,TaskResponse
-from services.task_service import create_task as create_task_service, get_project_tasks as get_project_tasks_service
+from services.task_service import (create_task as create_task_service,
+get_project_tasks as get_project_tasks_service, get_task as get_task_service)
 router = APIRouter()
 
 @router.post("/tasks", response_model=TaskResponse)
@@ -28,4 +29,15 @@ async def get_tasks(
     result = await get_project_tasks_service(project_id,user.id,db)
     if result is None:
         raise HTTPException(status_code=404,detail="Project not found")
+    return result
+
+@router.get("/tasks/{task_id}", response_model=TaskResponse)
+async def get_task(
+        task_id: int,
+        user = Depends(get_current_user),
+        db : AsyncSession = Depends(get_db)
+):
+    result = await get_task_service(task_id,user.id,db)
+    if result is None:
+        raise HTTPException(status_code=404,detail="Task not found")
     return result

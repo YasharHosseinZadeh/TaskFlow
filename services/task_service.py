@@ -46,3 +46,20 @@ async def get_project_tasks(project_id:int,user_id:int,db: AsyncSession):
     tasks = await db.execute(select(Task).where(Task.project_id == project_id))
     result = tasks.scalars().all()
     return result
+
+
+async def get_task(task_id:int,user_id:int,db: AsyncSession):
+    task = await db.execute(select(Task).where(Task.id == task_id))
+    task_result = task.scalar_one_or_none()
+
+    if task_result is None:
+        return None
+
+    project = await db.execute(select(Project).where(Project.owner_id == user_id)
+    .where(Project.id == task_result.project_id))
+    result = project.scalar_one_or_none()
+
+    if result is None:
+        return None
+
+    return task_result
