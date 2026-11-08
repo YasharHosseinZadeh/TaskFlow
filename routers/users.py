@@ -1,12 +1,10 @@
 from fastapi import APIRouter,Depends,HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from core.security import hash_password, verify_password, create_access_token
+from services.user_service import (create_user as create_user_service,
+login as login_service )
 from database import get_db
 from dependencies import get_current_user
-from models import User
 from schemas.user import UserResponse, UserCreate, UserLogin
-from sqlalchemy import select
 
 router = APIRouter()
 
@@ -15,34 +13,20 @@ async def register_user(
         user_info : UserCreate,
         db: AsyncSession = Depends(get_db)
 ):
-    result = await db.execute(select(User).where(User.email == user_info.email))
-    user =  result.scalar_one_or_none()
-    if user :
+    result = await create_user_service(user_info, db)
+
+    if result is None :
         raise HTTPException(status_code=400, detail="User already exists")
 
-    password = hash_password(user_info.password)
-
-    creating_user = User(
-        name=user_info.name,
-        email=user_info.email,
-        password_hash=password
-    )
-
-    db.add(creating_user)
-    await db.commit()
-    await db.refresh(creating_user)
-    return creating_user
+    return result
 
 
-@router.get("/users/me")
+@router.get("/users/me",response_model=UserResponse)
 async def check_user(
-    user=Depends(get_current_user)
+        user=Depends(get_current_user)
 ):
-    return {
-        "id": user.id,
-        "name": user.name,
-        "email": user.email
-    }
+    return user
+
 
 
 @router.post("/login")
@@ -50,20 +34,10 @@ async def login(
         info : UserLogin,
         db: AsyncSession = Depends(get_db)
 ):
-    result  = await db.execute(select(User).where(User.email == info.email))
-    user = result.scalar_one_or_none()
+    result = await login_service(info, db)
 
-    if user is None:
+    if result is None:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
 
-    result = verify_password(info.password, user.password_hash)
+    return result
 
-    if not result:
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
-
-    token = create_access_token(user.id)
-
-    return {
-        "access_token": token,
-        "token_type": "bearer"
-}
