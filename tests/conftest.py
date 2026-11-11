@@ -7,6 +7,7 @@ from database import Base, get_db
 from models.user import User
 from models.project import Project
 from models.task import Task
+from core.security import hash_password
 
 
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
@@ -44,4 +45,17 @@ async def client():
     ) as client:
         yield client
 
+
+@pytest_asyncio.fixture
+async def test_user():
+    async with TestingSessionLocal() as session:
+        user = User(
+            name = "test",
+            email = "test@example.com",
+            password_hash = hash_password("test1234")
+        )
+        session.add(user)
+        await session.commit()
+        await session.refresh(user)
+        return user
 
