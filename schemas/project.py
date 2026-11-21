@@ -2,7 +2,7 @@ from pydantic import BaseModel,Field,ConfigDict
 
 
 class ProjectCreate(BaseModel):
-    name: str = Field(max_length=100)
+    name: str = Field(min_length = 1,max_length=100)
     description: str | None = None
 
 

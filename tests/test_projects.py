@@ -1,3 +1,5 @@
+from wsgiref import headers
+
 from fastapi.testclient import TestClient
 from main import app
 import pytest
@@ -206,6 +208,155 @@ async def test_delete_project(client,setup_database,test_user):
     assert response.status_code == 200
     response = await client.get(
         f"/projects/{project_id}",headers =headers
+    )
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Project id is wrong"
+
+# Error handling
+@pytest.mark.asyncio
+async def test_get_projects_without_auth(client,setup_database):
+    response = await client.get(
+        "/projects"
+    )
+    assert response.status_code == 401
+    assert response.json()["detail"] == "Not authenticated"
+
+
+@pytest.mark.asyncio
+async def test_create_project_invalid_data(client, setup_database, test_user):
+    response = await client.post(
+        "/login",
+        json={
+            "email": test_user.email,
+            "password": "test1234"
+        }
+    )
+    assert response.status_code == 200
+    data = response.json()["access_token"]
+    headers = {"Authorization": f"Bearer {data}"}
+    response = await client.post(
+        "/projects",headers =headers,
+        json={
+            "name": "",
+            "description": "test"
+        }
+    )
+    assert response.status_code == 422
+
+@pytest.mark.asyncio
+async def test_create_project_long_name(client,setup_database,test_user):
+    response = await client.post(
+        "/login",
+        json={
+            "email": test_user.email,
+            "password": "test1234"
+        }
+    )
+    assert response.status_code == 200
+    data = response.json()["access_token"]
+    headers = {"Authorization": f"Bearer {data}"}
+    response = await client.post(
+        "/projects",headers =headers,
+        json={
+            "name": "A"* 101,
+            "description": "test"
+        }
+    )
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_get_nonexistent_project(client,setup_database,test_user):
+    response = await client.post(
+        "/login",
+        json={
+            "email": test_user.email,
+            "password": "test1234"
+        }
+    )
+    assert response.status_code == 200
+    data = response.json()["access_token"]
+    headers = {"Authorization": f"Bearer {data}"}
+    response = await client.get(
+        f"/projects/999",headers =headers
+    )
+    assert response.status_code == 404
+
+@pytest.mark.asyncio
+async def test_update_other_user_project(client,setup_database,test_user,test_user2):
+    response = await client.post(
+        "/login",
+        json={
+            "email": test_user.email,
+            "password": "test1234"
+        }
+    )
+    assert response.status_code == 200
+    data = response.json()["access_token"]
+    headers = {"Authorization": f"Bearer {data}"}
+    response = await client.post(
+        "/projects",headers =headers,
+        json={
+            "name": "test",
+            "description": "test"
+        }
+    )
+    assert response.status_code == 200
+    project_id = response.json()["id"]
+    response = await client.post(
+        "/login"
+        ,headers =headers
+        ,json={
+            "email": test_user2.email,
+            "password": "test12345"
+        }
+    )
+    assert response.status_code == 200
+    data = response.json()["access_token"]
+    headers = {"Authorization": f"Bearer {data}"}
+    response = await client.patch(
+        f"/projects/{project_id}",headers =headers,
+        json={
+            "name": "hacked project"
+        }
+    )
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Project id is wrong"
+
+
+@pytest.mark.asyncio
+async def test_delete_other_user_project(client,setup_database,test_user,test_user2):
+    response = await client.post(
+        "/login",
+        json={
+            "email": test_user.email,
+            "password": "test1234"
+        }
+    )
+    assert response.status_code == 200
+    data = response.json()["access_token"]
+    headers = {"Authorization": f"Bearer {data}"}
+    response = await client.post(
+        "/projects",headers =headers,
+        json={
+            "name": "test",
+            "description": "test"
+        }
+    )
+    assert response.status_code == 200
+    project_id = response.json()["id"]
+    response = await client.post(
+        "/login"
+        ,json={
+            "email": test_user2.email,
+            "password": "test12345"
+        }
+    )
+    assert response.status_code == 200
+    data = response.json()["access_token"]
+    headers = {"Authorization": f"Bearer {data}"}
+    response = await client.delete(
+        f"/projects/{project_id}",headers =headers,
     )
     assert response.status_code == 404
     assert response.json()["detail"] == "Project id is wrong"
