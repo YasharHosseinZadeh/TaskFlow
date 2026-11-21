@@ -1,9 +1,7 @@
-from wsgiref import headers
-
-from fastapi.testclient import TestClient
-from main import app
 import pytest
+from fastapi.testclient import TestClient
 
+from main import app
 
 client = TestClient(app)
 
@@ -278,7 +276,7 @@ async def test_get_nonexistent_project(client,setup_database,test_user):
     data = response.json()["access_token"]
     headers = {"Authorization": f"Bearer {data}"}
     response = await client.get(
-        f"/projects/999",headers =headers
+        "/projects/999",headers =headers
     )
     assert response.status_code == 404
 

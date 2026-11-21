@@ -1,11 +1,9 @@
-from datetime import datetime, timedelta,timezone
-
-
-from pwdlib import PasswordHash
 import os
-from dotenv import load_dotenv
-import jwt
+from datetime import UTC, datetime, timedelta
 
+import jwt
+from dotenv import load_dotenv
+from pwdlib import PasswordHash
 
 load_dotenv()
 SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -21,7 +19,7 @@ def verify_password(password:str, hashed_password:str) -> bool:
 
 
 def create_access_token(user_id:int):
-    expire = datetime.now(timezone.utc) + timedelta(minutes=30)
+    expire = datetime.now(UTC) + timedelta(minutes=30)
     payload = {
         "sub": str(user_id),
         "exp": expire

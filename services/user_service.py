@@ -1,8 +1,10 @@
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from core.security import hash_password, verify_password, create_access_token
+
+from core.security import create_access_token, hash_password, verify_password
 from models.user import User
 from schemas.user import UserCreate, UserLogin
-from sqlalchemy import select
+
 
 async def create_user(
         user_info : UserCreate,

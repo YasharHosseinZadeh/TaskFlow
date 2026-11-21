@@ -1,9 +1,10 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from models import Project
-from schemas.task import TaskCreate, TaskUpdate
 from models.task import Task
+from schemas.task import TaskCreate, TaskUpdate
+
 
 async def create_task(
         task_info:TaskCreate,

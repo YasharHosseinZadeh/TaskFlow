@@ -1,14 +1,19 @@
+from datetime import UTC, datetime, timedelta
+
 import jwt
-from core.security import (hash_password, verify_password, create_access_token,
-SECRET_KEY,decode_access_token
-                           )
-from models.task import TaskPriority,TaskStatus
-from schemas.user import UserCreate
-from schemas.task import TaskCreate
 import pytest
 from pydantic import ValidationError
-from datetime import datetime, timedelta,timezone
 
+from core.security import (
+    SECRET_KEY,
+    create_access_token,
+    decode_access_token,
+    hash_password,
+    verify_password,
+)
+from models.task import TaskPriority, TaskStatus
+from schemas.task import TaskCreate
+from schemas.user import UserCreate
 
 
 def test_user_create():
@@ -24,7 +29,7 @@ def test_user_create():
 
 def test_user_create_invalid_email():
     with pytest.raises(ValidationError):
-        user = UserCreate(
+        UserCreate(
             name="Alex",
             email="not-an-email",
             password= "mypassword123"
@@ -33,7 +38,7 @@ def test_user_create_invalid_email():
 
 def test_user_create_short_password():
     with pytest.raises(ValidationError):
-        user = UserCreate(
+        UserCreate(
             name="Alex",
             email="alex@example.com",
             password= "abc"
@@ -53,7 +58,7 @@ def test_task_create_defaults():
 
 def test_task_create_empty_title():
     with pytest.raises(ValidationError):
-        user = TaskCreate(
+        TaskCreate(
             title="",
             project_id=1
         )
@@ -91,12 +96,12 @@ def test_decode_access_token():
 def test_decode_access_invalid_token():
     token = "shgfjwfwfiwwwbwy2327hjb27ef"
     with pytest.raises(ValueError):
-        result = decode_access_token(token)
+        decode_access_token(token)
 
 
 def test_decode_access_expired_token():
     user_id = 1
-    expire = datetime.now(timezone.utc) - timedelta(minutes=30)
+    expire = datetime.now(UTC) - timedelta(minutes=30)
     payload = {
         "sub": str(user_id),
         "exp": expire

@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from routers import users,projects,tasks
+
+from routers import projects, tasks, users
 
 app = FastAPI(title="TaskFlow API")
 

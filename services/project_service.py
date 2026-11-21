@@ -1,13 +1,14 @@
 
 
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
-from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Depends
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+
 from database import get_db
 from models import Project
 from schemas.project import ProjectCreate, ProjectUpdate
-from models.user import User
+
 
 async def create_project(
         project_info : ProjectCreate,

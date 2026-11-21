@@ -1,15 +1,14 @@
-from logging.config import fileConfig
-from sqlalchemy.ext.asyncio import async_engine_from_config
-import sqlalchemy
 import asyncio
-from database import Base
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-from models.__init__ import *
-from alembic import context
 import os
-from dotenv import load_dotenv
+from logging.config import fileConfig
 
+from alembic import context
+from dotenv import load_dotenv
+from sqlalchemy import pool
+from sqlalchemy.ext.asyncio import async_engine_from_config
+
+from database import Base
+from models.__init__ import *
 
 load_dotenv()
 database_url = os.environ.get("DATABASE_URL")

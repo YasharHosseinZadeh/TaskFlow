@@ -1,16 +1,25 @@
-from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from services.project_service import (create_project as create_project_service,
-get_projects as get_projects_service,
-get_project as get_project_service,
-update_project as update_project_service,
-delete_project as delete_project_service,)
+
 from database import get_db
 from dependencies import get_current_user
-from models import Project
 from schemas.project import ProjectCreate, ProjectResponse, ProjectUpdate
+from services.project_service import (
+    create_project as create_project_service,
+)
+from services.project_service import (
+    delete_project as delete_project_service,
+)
+from services.project_service import (
+    get_project as get_project_service,
+)
+from services.project_service import (
+    get_projects as get_projects_service,
+)
+from services.project_service import (
+    update_project as update_project_service,
+)
 
 router = APIRouter()
 
@@ -29,7 +38,7 @@ async def create_project(
     return result
 
 
-@router.get("/projects",response_model=List[ProjectResponse])
+@router.get("/projects",response_model=list[ProjectResponse])
 async def get_projects(
         user = Depends(get_current_user),
         db : AsyncSession = Depends(get_db)

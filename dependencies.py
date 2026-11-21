@@ -1,10 +1,11 @@
 from fastapi import Depends, HTTPException
-from models import User
 from fastapi.security import HTTPBearer
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from core.security import decode_access_token
 from database import get_db
+from models import User
 
 security = HTTPBearer()
 async def get_current_user(
