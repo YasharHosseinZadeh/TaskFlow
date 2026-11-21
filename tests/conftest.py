@@ -59,3 +59,17 @@ async def test_user():
         await session.refresh(user)
         return user
 
+@pytest_asyncio.fixture
+async def test_user2():
+    async with TestingSessionLocal() as session:
+        user = User(
+            name = "test2",
+            email = "test2@example.com",
+            password_hash = hash_password("test12345")
+        )
+        session.add(user)
+        await session.commit()
+        await session.refresh(user)
+        return user
+
+
