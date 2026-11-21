@@ -73,3 +73,18 @@ async def test_user2():
         return user
 
 
+@pytest_asyncio.fixture
+async def test_project(test_user):
+    async with TestingSessionLocal() as session:
+        project= Project(
+            name = "test",
+            description = "test",
+            owner_id = test_user.id,
+        )
+        session.add(project)
+        await session.commit()
+        await session.refresh(project)
+        return project
+
+
+
