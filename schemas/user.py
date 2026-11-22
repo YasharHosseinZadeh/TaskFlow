@@ -9,9 +9,10 @@ class UserCreate(BaseModel):
 
 class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    id : int
+    id: int
     name: str
     email: EmailStr
+
 
 class UserLogin(BaseModel):
     email: EmailStr

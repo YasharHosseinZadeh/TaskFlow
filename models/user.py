@@ -10,15 +10,14 @@ from database import Base
 
 
 class User(Base):
+    __tablename__ = "users"
 
-    __tablename__ = 'users'
+    id: Mapped[int] = mapped_column(primary_key=True)
 
-    id : Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(100))
 
-    name : Mapped[str] = mapped_column(String(100))
+    email: Mapped[str] = mapped_column(String(255), unique=True)
 
-    email : Mapped[str] = mapped_column(String(255),unique=True)
+    password_hash: Mapped[str] = mapped_column(String(255))
 
-    password_hash : Mapped[str] = mapped_column(String(255))
-
-    projects : Mapped[list["Project"]] = relationship( back_populates="owner")
+    projects: Mapped[list["Project"]] = relationship(back_populates="owner")

@@ -6,10 +6,7 @@ from models.user import User
 from schemas.user import UserCreate, UserLogin
 
 
-async def create_user(
-        user_info : UserCreate,
-        db : AsyncSession
-):
+async def create_user(user_info: UserCreate, db: AsyncSession):
     user = await db.execute(select(User).where(User.email == user_info.email))
     result = user.scalar_one_or_none()
 
@@ -17,11 +14,9 @@ async def create_user(
         password = hash_password(user_info.password)
 
         result = User(
-            name=user_info.name,
-            email=user_info.email,
-            password_hash=password
+            name=user_info.name, email=user_info.email, password_hash=password
         )
-    else :
+    else:
         return None
 
     db.add(result)
@@ -30,11 +25,8 @@ async def create_user(
     return result
 
 
-async def login(
-        info : UserLogin,
-        db : AsyncSession
-):
-    user  = await db.execute(select(User).where(User.email == info.email))
+async def login(info: UserLogin, db: AsyncSession):
+    user = await db.execute(select(User).where(User.email == info.email))
     user_result = user.scalar_one_or_none()
 
     if user_result is None:

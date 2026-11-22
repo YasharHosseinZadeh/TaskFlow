@@ -6,11 +6,7 @@ from models.task import Task
 from schemas.task import TaskCreate, TaskUpdate
 
 
-async def create_task(
-        task_info:TaskCreate,
-        user_id: int,
-        db : AsyncSession
-):
+async def create_task(task_info: TaskCreate, user_id: int, db: AsyncSession):
     project = await db.execute(
         select(Project)
         .where(Project.id == task_info.project_id)
@@ -26,9 +22,8 @@ async def create_task(
         description=task_info.description,
         status=task_info.status,
         priority=task_info.priority,
-        project_id=result.id
+        project_id=result.id,
     )
-
 
     db.add(task)
     await db.commit()
@@ -36,9 +31,12 @@ async def create_task(
     return task
 
 
-async def get_project_tasks(project_id:int,user_id:int,db: AsyncSession):
-    project = await db.execute(select(Project).where(Project.id == project_id)
-    .where(Project.owner_id == user_id))
+async def get_project_tasks(project_id: int, user_id: int, db: AsyncSession):
+    project = await db.execute(
+        select(Project)
+        .where(Project.id == project_id)
+        .where(Project.owner_id == user_id)
+    )
     result = project.scalar_one_or_none()
 
     if result is None:
@@ -49,15 +47,18 @@ async def get_project_tasks(project_id:int,user_id:int,db: AsyncSession):
     return result
 
 
-async def get_task(task_id:int,user_id:int,db: AsyncSession):
+async def get_task(task_id: int, user_id: int, db: AsyncSession):
     task = await db.execute(select(Task).where(Task.id == task_id))
     task_result = task.scalar_one_or_none()
 
     if task_result is None:
         return None
 
-    project = await db.execute(select(Project).where(Project.owner_id == user_id)
-    .where(Project.id == task_result.project_id))
+    project = await db.execute(
+        select(Project)
+        .where(Project.owner_id == user_id)
+        .where(Project.id == task_result.project_id)
+    )
     result = project.scalar_one_or_none()
 
     if result is None:
@@ -66,15 +67,20 @@ async def get_task(task_id:int,user_id:int,db: AsyncSession):
     return task_result
 
 
-async def update_task(task_id:int,task_info:TaskUpdate,user_id:int,db: AsyncSession):
+async def update_task(
+    task_id: int, task_info: TaskUpdate, user_id: int, db: AsyncSession
+):
     task = await db.execute(select(Task).where(Task.id == task_id))
     task_result = task.scalar_one_or_none()
 
     if task_result is None:
         return None
 
-    project = await db.execute(select(Project).where(Project.owner_id == user_id)
-    .where(Project.id == task_result.project_id))
+    project = await db.execute(
+        select(Project)
+        .where(Project.owner_id == user_id)
+        .where(Project.id == task_result.project_id)
+    )
     result = project.scalar_one_or_none()
 
     if result is None:
@@ -90,15 +96,18 @@ async def update_task(task_id:int,task_info:TaskUpdate,user_id:int,db: AsyncSess
     return task_result
 
 
-async def delete_task(task_id:int,user_id:int,db: AsyncSession):
+async def delete_task(task_id: int, user_id: int, db: AsyncSession):
     task = await db.execute(select(Task).where(Task.id == task_id))
     task_result = task.scalar_one_or_none()
 
     if task_result is None:
         return None
 
-    project = await db.execute(select(Project).where(Project.owner_id == user_id)
-    .where(Project.id == task_result.project_id))
+    project = await db.execute(
+        select(Project)
+        .where(Project.owner_id == user_id)
+        .where(Project.id == task_result.project_id)
+    )
     result = project.scalar_one_or_none()
 
     if result is None:
@@ -106,6 +115,4 @@ async def delete_task(task_id:int,user_id:int,db: AsyncSession):
 
     await db.delete(task_result)
     await db.commit()
-    return {
-        "message": "Task deleted"
-    }
+    return {"message": "Task deleted"}

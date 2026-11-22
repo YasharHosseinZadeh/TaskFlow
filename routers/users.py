@@ -9,36 +9,27 @@ from services.user_service import login as login_service
 
 router = APIRouter()
 
+
 @router.post("/users", response_model=UserResponse)
-async def register_user(
-        user_info : UserCreate,
-        db: AsyncSession = Depends(get_db)
-):
+async def register_user(user_info: UserCreate, db: AsyncSession = Depends(get_db)):
     result = await create_user_service(user_info, db)
 
-    if result is None :
+    if result is None:
         raise HTTPException(status_code=400, detail="User already exists")
 
     return result
 
 
-@router.get("/users/me",response_model=UserResponse)
-async def check_user(
-        user=Depends(get_current_user)
-):
+@router.get("/users/me", response_model=UserResponse)
+async def check_user(user=Depends(get_current_user)):
     return user
 
 
-
 @router.post("/login")
-async def login(
-        info : UserLogin,
-        db: AsyncSession = Depends(get_db)
-):
+async def login(info: UserLogin, db: AsyncSession = Depends(get_db)):
     result = await login_service(info, db)
 
     if result is None:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
 
     return result
-

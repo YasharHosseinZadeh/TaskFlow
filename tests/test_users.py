@@ -5,62 +5,43 @@ from main import app
 
 client = TestClient(app)
 
+
 @pytest.mark.asyncio
-async def test_register_user(client,setup_database):
+async def test_register_user(client, setup_database):
     response = await client.post(
         "/users",
-        json={
-            "name": "Alex",
-            "email": "alex@example.com",
-            "password": "mypassword123"
-        }
+        json={"name": "Alex", "email": "alex@example.com", "password": "mypassword123"},
     )
     assert response.status_code == 200
     assert response.json()["email"] == "alex@example.com"
 
 
 @pytest.mark.asyncio
-async def test_register_with_existing_user(client,setup_database):
+async def test_register_with_existing_user(client, setup_database):
     response = await client.post(
         "/users",
-        json={
-            "name": "Alex",
-            "email": "alex@example.com",
-            "password": "mypassword123"
-        }
+        json={"name": "Alex", "email": "alex@example.com", "password": "mypassword123"},
     )
     assert response.status_code == 200
 
     response = await client.post(
         "/users",
-        json={
-            "name": "test",
-            "email": "alex@example.com",
-            "password": "mypassword123"
-        }
+        json={"name": "test", "email": "alex@example.com", "password": "mypassword123"},
     )
     assert response.status_code == 400
-    assert response.json() == {"detail" : "User already exists"}
+    assert response.json() == {"detail": "User already exists"}
 
 
 @pytest.mark.asyncio
-async def test_login(client,setup_database):
+async def test_login(client, setup_database):
     response = await client.post(
         "/users",
-        json={
-            "name": "Alex",
-            "email": "alex@example.com",
-            "password": "mypassword123"
-        }
+        json={"name": "Alex", "email": "alex@example.com", "password": "mypassword123"},
     )
     assert response.status_code == 200
 
     response = await client.post(
-        "/login",
-        json={
-            "email": "alex@example.com",
-            "password": "mypassword123"
-        }
+        "/login", json={"email": "alex@example.com", "password": "mypassword123"}
     )
     assert response.status_code == 200
     assert response.json()["token_type"] == "bearer"
@@ -68,22 +49,14 @@ async def test_login(client,setup_database):
 
 
 @pytest.mark.asyncio
-async def test_login_incorrect_info(client,setup_database):
+async def test_login_incorrect_info(client, setup_database):
     response = await client.post(
         "/users",
-        json={
-            "name": "Alex",
-            "email": "alex@example.com",
-            "password": "mypassword123"
-        }
+        json={"name": "Alex", "email": "alex@example.com", "password": "mypassword123"},
     )
     assert response.status_code == 200
     response = await client.post(
-        "/login",
-        json={
-            "email": "alex@example.com",
-            "password": "test1234"
-        }
+        "/login", json={"email": "alex@example.com", "password": "test1234"}
     )
     assert response.status_code == 400
-    assert response.json() == {"detail" : "Incorrect email or password"}
+    assert response.json() == {"detail": "Incorrect email or password"}

@@ -17,11 +17,7 @@ from schemas.user import UserCreate
 
 
 def test_user_create():
-    user = UserCreate(
-        name="Alex",
-        email="alex@example.com",
-        password= "mypassword123"
-    )
+    user = UserCreate(name="Alex", email="alex@example.com", password="mypassword123")
     assert user.name == "Alex"
     assert user.email == "alex@example.com"
     assert user.password == "mypassword123"
@@ -29,27 +25,16 @@ def test_user_create():
 
 def test_user_create_invalid_email():
     with pytest.raises(ValidationError):
-        UserCreate(
-            name="Alex",
-            email="not-an-email",
-            password= "mypassword123"
-        )
+        UserCreate(name="Alex", email="not-an-email", password="mypassword123")
 
 
 def test_user_create_short_password():
     with pytest.raises(ValidationError):
-        UserCreate(
-            name="Alex",
-            email="alex@example.com",
-            password= "abc"
-        )
+        UserCreate(name="Alex", email="alex@example.com", password="abc")
 
 
 def test_task_create_defaults():
-    task = TaskCreate(
-        title="title",
-        project_id= 1
-    )
+    task = TaskCreate(title="title", project_id=1)
     assert task.title == "title"
     assert task.project_id == 1
     assert task.priority == TaskPriority.MEDIUM
@@ -58,29 +43,21 @@ def test_task_create_defaults():
 
 def test_task_create_empty_title():
     with pytest.raises(ValidationError):
-        TaskCreate(
-            title="",
-            project_id=1
-        )
+        TaskCreate(title="", project_id=1)
 
 
 def test_functions_password():
     password = "test1234"
     wrong_password = "TEst1234"
-    hashed_password= hash_password(password)
+    hashed_password = hash_password(password)
     assert verify_password(password, hashed_password)
     assert not verify_password(wrong_password, hashed_password)
-
 
 
 def test_create_access_token():
     user_id = 1
     token = create_access_token(user_id)
-    payload = jwt.decode(
-        token,
-        SECRET_KEY,
-        algorithms=["HS256"]
-   )
+    payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
     assert payload["sub"] == str(user_id)
     assert payload["exp"] is not None
 
@@ -102,10 +79,7 @@ def test_decode_access_invalid_token():
 def test_decode_access_expired_token():
     user_id = 1
     expire = datetime.now(UTC) - timedelta(minutes=30)
-    payload = {
-        "sub": str(user_id),
-        "exp": expire
-    }
+    payload = {"sub": str(user_id), "exp": expire}
     token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
     with pytest.raises(ValueError):
-         decode_access_token(token)
+        decode_access_token(token)

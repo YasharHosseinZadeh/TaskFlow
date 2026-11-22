@@ -12,63 +12,59 @@ from services.task_service import update_task as update_task_service
 
 router = APIRouter()
 
+
 @router.post("/tasks", response_model=TaskResponse)
 async def create_task(
-        task_info: TaskCreate,
-        user = Depends(get_current_user),
-        db : AsyncSession = Depends(get_db)
+    task_info: TaskCreate,
+    user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
-    result = await create_task_service(task_info, user.id,db)
+    result = await create_task_service(task_info, user.id, db)
 
     if result is None:
-        raise HTTPException(status_code=404,detail="Project not found")
+        raise HTTPException(status_code=404, detail="Project not found")
     return result
 
 
 @router.get("/projects/{project_id}/tasks", response_model=list[TaskResponse])
 async def get_tasks(
-        project_id: int,
-        user = Depends(get_current_user),
-        db : AsyncSession = Depends(get_db)
+    project_id: int, user=Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
-    result = await get_project_tasks_service(project_id,user.id,db)
+    result = await get_project_tasks_service(project_id, user.id, db)
     if result is None:
-        raise HTTPException(status_code=404,detail="Project not found")
+        raise HTTPException(status_code=404, detail="Project not found")
     return result
+
 
 @router.get("/tasks/{task_id}", response_model=TaskResponse)
 async def get_task(
-        task_id: int,
-        user = Depends(get_current_user),
-        db : AsyncSession = Depends(get_db)
+    task_id: int, user=Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
-    result = await get_task_service(task_id,user.id,db)
+    result = await get_task_service(task_id, user.id, db)
     if result is None:
-        raise HTTPException(status_code=404,detail="Task not found")
+        raise HTTPException(status_code=404, detail="Task not found")
     return result
 
 
 @router.patch("/tasks/{task_id}", response_model=TaskResponse)
 async def update_task(
-        task_id: int,
-        task_info: TaskUpdate,
-        user = Depends(get_current_user),
-        db : AsyncSession = Depends(get_db)
+    task_id: int,
+    task_info: TaskUpdate,
+    user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
-    result = await update_task_service(task_id,task_info,user.id,db)
+    result = await update_task_service(task_id, task_info, user.id, db)
 
     if result is None:
-        raise HTTPException(status_code=404,detail="Task not found")
+        raise HTTPException(status_code=404, detail="Task not found")
     return result
 
 
 @router.delete("/tasks/{task_id}")
 async def delete_task(
-        task_id: int,
-        user = Depends(get_current_user),
-        db : AsyncSession = Depends(get_db)
+    task_id: int, user=Depends(get_current_user), db: AsyncSession = Depends(get_db)
 ):
-    result = await delete_task_service(task_id,user.id,db)
+    result = await delete_task_service(task_id, user.id, db)
     if result is None:
-        raise HTTPException(status_code=404,detail="Task not found")
+        raise HTTPException(status_code=404, detail="Task not found")
     return result
