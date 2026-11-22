@@ -51,3 +51,7 @@ jobs:
           context: .
           push: true
           tags: yasharhosseinzadeh/taskflow:latest
+
+      - name: Trigger Render deployment
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: curl --retry 3 -fsS -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
